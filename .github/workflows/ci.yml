@@ -176,12 +176,20 @@ jobs:
         browser: [chromium, firefox, webkit]
 
     runs-on: ubuntu-24.04
+    # the browsers of playwright_ex's driver version
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble
     env:
+      ImageOS: ubuntu22
+      HOME: /root
       MIX_ENV: e2e
       PW_BROWSER: ${{ matrix.browser }}
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: install unzip
+        run: apt update && apt -y install unzip
 
       - name: Set up Elixir
         uses: erlef/setup-beam@54075bcc5e249e4758d363f27d099f55d843f124 # v1.24.1
@@ -202,11 +210,6 @@ jobs:
       - name: Install dependencies
         run: mix deps.get
 
-      - name: Set up Node.js 24.x
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 24.x
-
       - name: Restore npm cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
@@ -224,16 +227,9 @@ jobs:
         env:
           MIX_ENV: dev
 
-      - name: Restore Playwright cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: |
-            ~/.cache/ms-playwright
-            ~/.cache/playwright_ex
-          key: playwright-${{ runner.os }}-${{ matrix.browser }}-${{ hashFiles('**/mix.lock') }}
-
-      - name: Install Playwright driver and browser
-        run: mix playwright_ex.install -- ${{ matrix.browser }} --with-deps
+      # the image has the browsers
+      - name: Install Playwright driver
+        run: mix playwright_ex.install --no-browsers
 
       # retries: 2, as Playwright Test on CI; the reruns don't overwrite the coverage export
       - name: Run e2e tests
