@@ -115,7 +115,7 @@ defmodule Phoenix.LiveViewTest.E2E.Utils do
   @doc """
   A JS array that listeners fill (`const logs = []; page.on("console", (e) => logs.push(...))`).
 
-  An unlinked process: listeners fire until the context closes, after the test process has
+  An unlinked process: listeners still run in `on_exit` callbacks, after the test process has
   exited (see "Route handlers and listeners" in PlaywrightEx's ExUnit guide).
   """
   def array do

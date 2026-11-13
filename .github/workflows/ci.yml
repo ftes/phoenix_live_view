@@ -234,7 +234,8 @@ jobs:
       # retries: 2, as Playwright Test on CI; the reruns don't overwrite the coverage export
       - name: Run e2e tests
         run: |
-          mix test --cover --export-coverage e2e-${{ matrix.browser }} ||
+          mix test --cover --export-coverage e2e-${{ matrix.browser }} \
+            --formatter ExUnit.CLIFormatter --formatter PlaywrightEx.Test.GitHubFormatter ||
             mix test --failed ||
             mix test --failed
 
