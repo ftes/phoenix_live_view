@@ -171,19 +171,26 @@ $ npm run js:test
 $ npm run js:test.watch
 ```
 
-Running the JavaScript end-to-end tests:
+Running the end-to-end tests (see [test/e2e](test/e2e/README.md)):
 
 ```bash
 $ mix deps.get
 $ npm ci
-$ npm run e2e:test
+$ mix assets.build
+$ MIX_ENV=e2e mix deps.get
+$ MIX_ENV=e2e mix playwright_ex.install
+$ MIX_ENV=e2e mix test
+# other browsers
+$ PW_BROWSER=firefox MIX_ENV=e2e mix test
 ```
 
-Checking test coverage:
+`npm run e2e:test` builds the assets, installs the browsers and runs all three.
+
+Checking JavaScript test coverage (runs all JavaScript tests first):
 
 ```bash
 $ npm run cover
-$ npm run cover:report
+# then open cover/merged-js/index.html
 ```
 
 Format the files:

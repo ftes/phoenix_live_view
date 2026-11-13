@@ -14,8 +14,6 @@ Application.put_env(:phoenix_live_view, Phoenix.LiveViewTest.E2E.Endpoint,
   debug_errors: false
 )
 
-Process.register(self(), :e2e_helper)
-
 defmodule Phoenix.LiveViewTest.E2E.ErrorHTML do
   def render(template, _), do: Phoenix.Controller.status_message_from_template(template)
 end
@@ -330,9 +328,6 @@ defmodule Phoenix.LiveViewTest.E2E.Endpoint do
 
   plug Plug.Static, from: System.tmp_dir!(), at: "/tmp"
 
-  plug :health_check
-  plug :halt
-
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
@@ -340,20 +335,6 @@ defmodule Phoenix.LiveViewTest.E2E.Endpoint do
 
   plug Plug.Session, @session_options
   plug Phoenix.LiveViewTest.E2E.Router
-
-  defp health_check(%{request_path: "/health"} = conn, _opts) do
-    conn |> Plug.Conn.send_resp(200, "OK") |> Plug.Conn.halt()
-  end
-
-  defp health_check(conn, _opts), do: conn
-
-  defp halt(%{request_path: "/halt"}, _opts) do
-    send(:e2e_helper, :halt)
-    # this ensure playwright waits until the server force stops
-    Process.sleep(:infinity)
-  end
-
-  defp halt(conn, _opts), do: conn
 end
 
 {:ok, _} =
@@ -370,15 +351,5 @@ IO.puts("Starting e2e server on port #{Phoenix.LiveViewTest.E2E.Endpoint.config(
 # we need to manually compile the colocated hooks / js and css
 Phoenix.LiveView.ColocatedAssets.compile()
 
-if not IEx.started?() do
-  # when running the test server manually, we halt after
-  # reading from stdin
-  spawn(fn ->
-    IO.read(:stdio, :line)
-    send(:e2e_helper, :halt)
-  end)
-
-  receive do
-    :halt -> :ok
-  end
-end
+# Playwright Test's default test timeout
+ExUnit.start(timeout: 30_000)
