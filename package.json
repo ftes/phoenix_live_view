@@ -55,6 +55,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "e2e:test": "mix assets.build && MIX_ENV=e2e mix playwright_ex.install && for b in chromium firefox webkit; do MIX_ENV=e2e PW_BROWSER=$b mix test || exit 1; done",
     "e2e:coverage": "node test/e2e/coverage-report.js",
     "js:test": "npm run build && jest",
     "js:test.coverage": "npm run build && jest --coverage",
@@ -62,7 +63,7 @@
     "js:lint": "eslint",
     "js:format": "prettier --write assets --log-level warn && prettier --write test/e2e --log-level warn",
     "js:format.check": "prettier --check assets --log-level warn && prettier --check test/e2e --log-level warn",
-    "test": "npm run js:test",
+    "test": "npm run js:test && npm run e2e:test",
     "typecheck:tests": "tsc -p assets/test/tsconfig.json",
     "cover:merge": "node test/e2e/merge-coverage.js",
     "cover": "npm test && npm run e2e:coverage && npm run cover:merge",

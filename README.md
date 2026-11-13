@@ -184,7 +184,9 @@ $ MIX_ENV=e2e mix test
 $ PW_BROWSER=firefox MIX_ENV=e2e mix test
 ```
 
-Checking JavaScript test coverage (after the end-to-end tests on Chromium):
+`npm run e2e:test` builds the assets, installs the browsers and runs all three.
+
+Checking JavaScript test coverage (runs all JavaScript tests first):
 
 ```bash
 $ npm run cover
