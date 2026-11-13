@@ -122,7 +122,7 @@ defmodule Phoenix.LiveViewTest.E2E.Hooks do
 end
 
 defmodule Phoenix.LiveViewTest.E2E.EvalController do
-  use Phoenix.Controller, formats: [:json]
+  use Phoenix.Controller
 
   plug :accepts, ["json"]
 
@@ -133,7 +133,7 @@ defmodule Phoenix.LiveViewTest.E2E.EvalController do
 end
 
 defmodule Phoenix.LiveViewTest.E2E.SubmitController do
-  use Phoenix.Controller, formats: [:html]
+  use Phoenix.Controller
 
   def submit(conn, params) do
     send_resp(conn, 200, Phoenix.json_library().encode!(params))
