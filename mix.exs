@@ -78,7 +78,7 @@ defmodule Phoenix.LiveView.MixProject do
       {:phoenix_ecto, "~> 4.5", only: :e2e},
       # TODO: use the Hex release once it is out
       {:playwright_ex,
-       github: "ftes/playwright_ex", ref: "f5854b14dc027e828698080dfb930a456759484d", only: :e2e}
+       github: "ftes/playwright_ex", ref: "75fc01599ef19b812ef89f616d40abfb26c3033f", only: :e2e}
     ]
   end
 

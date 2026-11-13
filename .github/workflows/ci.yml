@@ -235,7 +235,8 @@ jobs:
       # Only test failures (exit 2) are retried, so an error after the tests still fails the job.
       - name: Run e2e tests
         run: |
-          mix test --cover --export-coverage e2e-${{ matrix.browser }} ||
+          mix test --cover --export-coverage e2e-${{ matrix.browser }} \
+            --formatter ExUnit.CLIFormatter --formatter PlaywrightEx.Test.GitHubFormatter ||
             { [ $? -eq 2 ] && mix test --failed; } ||
             { [ $? -eq 2 ] && mix test --failed; }
 
