@@ -351,5 +351,11 @@ IO.puts("Starting e2e server on port #{Phoenix.LiveViewTest.E2E.Endpoint.config(
 # we need to manually compile the colocated hooks / js and css
 Phoenix.LiveView.ColocatedAssets.compile()
 
-# Playwright Test's default test timeout
-ExUnit.start(timeout: 30_000)
+# Playwright Test's default test timeout. All browsers in one run (no PW_BROWSER): half the
+# schedulers' modules at once, as Playwright Test's workers (`--max-cases` overrides it).
+max_cases =
+  if System.get_env("PW_BROWSER"),
+    do: [],
+    else: [max_cases: max(div(System.schedulers_online(), 2), 1)]
+
+ExUnit.start([timeout: 30_000] ++ max_cases)

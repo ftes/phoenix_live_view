@@ -2,8 +2,10 @@ defmodule Phoenix.LiveViewTest.E2E.Case do
   @moduledoc """
   The fixtures of the e2e tests (`page`, `request`, `browser_name`) and the projects' devices.
 
-  A run uses one browser, `PW_BROWSER` (see `config/e2e.exs`), and each module holds a pooled
-  driver and browser (`BrowserPool.browser/0` in `setup_all`), as Playwright Test's workers.
+  Each module runs once per project (`parameterize: projects()`), with `browser_name` in the
+  context as Playwright Test's `browserName` fixture; `PW_BROWSER=firefox` runs one project, as
+  `--project`. Each module holds a pooled driver and browser of its project
+  (`BrowserPool.browser/1` in `setup_all`), as Playwright Test's workers.
   Tests get a fresh context with the browser's desktop device, as the `projects` of a
   Playwright config with `devices["Desktop Chrome"]` and so on.
 
@@ -22,15 +24,24 @@ defmodule Phoenix.LiveViewTest.E2E.Case do
 
   @devices %{chromium: "Desktop Chrome", firefox: "Desktop Firefox", webkit: "Desktop Safari"}
 
-  @doc "The run's browser, as Playwright Test's `browserName`: `@tag skip: browser_name() == :webkit`."
-  def browser_name, do: Application.fetch_env!(:playwright_ex, :test)[:browser_name]
+  @doc "The config's `projects`: all browsers, or `PW_BROWSER`'s."
+  def projects do
+    case System.get_env("PW_BROWSER") do
+      nil -> for name <- [:chromium, :firefox, :webkit], do: %{browser_name: name}
+      name -> [%{browser_name: String.to_atom(name)}]
+    end
+  end
 
   defmacro __using__(opts) do
     quote do
-      use ExUnit.Case, Keyword.merge([async: true], unquote(opts))
+      use ExUnit.Case,
+          Keyword.merge(
+            [async: true, parameterize: Phoenix.LiveViewTest.E2E.Case.projects()],
+            unquote(opts)
+          )
+
       use PlaywrightEx.Test
 
-      import Phoenix.LiveViewTest.E2E.Case, only: [browser_name: 0]
       import Phoenix.LiveViewTest.E2E.Utils
 
       alias PlaywrightEx.{
@@ -54,8 +65,8 @@ defmodule Phoenix.LiveViewTest.E2E.Case do
 
       alias PlaywrightEx.Test.BrowserPool
 
-      setup_all do
-        Phoenix.LiveViewTest.E2E.Case.browser_fixture()
+      setup_all ctx do
+        Phoenix.LiveViewTest.E2E.Case.browser_fixture(ctx)
       end
 
       setup ctx do
@@ -65,18 +76,18 @@ defmodule Phoenix.LiveViewTest.E2E.Case do
   end
 
   @doc false
-  def browser_fixture do
-    browser = BrowserPool.browser()
+  def browser_fixture(%{browser_name: name}) do
+    browser = BrowserPool.browser(browser_name: name)
     playwright = BrowserPool.playwright(browser)
 
-    # `devices["Desktop Chrome"]` and so on; the project's browser is the run's.
+    # `devices["Desktop Chrome"]` and so on, of the project's browser
     device =
       playwright
       |> Playwright.devices()
-      |> Map.fetch!(@devices[browser_name()])
+      |> Map.fetch!(@devices[name])
       |> Map.delete(:default_browser_type)
 
-    %{browser: browser, browser_name: browser_name(), device: device, playwright: playwright}
+    %{browser: browser, device: device, playwright: playwright}
   end
 
   @doc false
@@ -103,7 +114,7 @@ defmodule Phoenix.LiveViewTest.E2E.Case do
       page |> Page.locator("[data-phx-skip]") |> Expect.to_have_count!(0)
     end)
 
-    if browser_name() == :chromium and !System.get_env("PW_NO_COVERAGE") do
+    if ctx.browser_name == :chromium and !System.get_env("PW_NO_COVERAGE") do
       coverage_fixture(page)
     end
 

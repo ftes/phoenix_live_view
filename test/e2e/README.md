@@ -16,12 +16,15 @@ port of the Playwright client, on ExUnit. They were ported one to one from the P
 $ MIX_ENV=e2e mix deps.get
 $ MIX_ENV=e2e mix playwright_ex.install # the driver and the browsers
 $ npm ci && mix assets.build            # the JS under test
-$ MIX_ENV=e2e mix test                  # Chromium
+$ MIX_ENV=e2e mix test                  # Chromium, Firefox and WebKit
 $ PW_BROWSER=firefox MIX_ENV=e2e mix test
 $ PW_BROWSER=webkit MIX_ENV=e2e mix test test/e2e/tests/streams.spec.exs:9
 ```
 
-A run uses one browser, `PW_BROWSER` (default `chromium`), as Playwright's `--project`.
+A run uses all three browsers, as Playwright's `projects`: each module runs once per browser
+(`parameterize:`), with `browser_name` in the context. `PW_BROWSER` runs one, as `--project`; CI
+runs a job per browser. With all three, half the schedulers' modules run at once, as Playwright's
+workers, and each browser keeps that many warm (`config/e2e.exs`, `test_helper.exs`).
 On Linux, `MIX_ENV=e2e mix playwright_ex.install -- webkit --with-deps` also installs the
 browser's system dependencies.
 
@@ -56,7 +59,8 @@ On Chromium, each test dumps its JS and CSS coverage to `test-results/coverage-d
 ## Known gaps
 
 - 4212 skips at runtime (feature detection in the page): ExUnit can't skip a running test, so it
-  reports as passed. Browser-only skips are `@tag skip:` and report as skipped.
+  reports as passed. So do the browser-only skips (`test.skip(browserName === ...)`), an `if`
+  around the body, as a module runs on all browsers.
 - No retries: rerun the failures with `mix test --failed` (CI does, twice).
 - Nested `describe` blocks are flattened: the outer one is the module, and a `describe` repeated
   in a loop is one `describe` with the loop inside.

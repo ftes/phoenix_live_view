@@ -4,10 +4,16 @@ config :logger, :level, :error
 
 config :phoenix_live_view, :root_tag_attribute, "phx-r"
 
-# playwright.config.js's `use` and `outputDir`. One browser per run: PW_BROWSER=firefox.
+# playwright.config.js's `use` and `outputDir` (its `projects`: `E2E.Case.projects/0`)
 config :playwright_ex, :test,
-  browser_name: String.to_atom(System.get_env("PW_BROWSER", "chromium")),
   context_options: [base_url: "http://localhost:4004/", ignore_https_errors: true],
   trace: :retain_on_failure,
   screenshot: :only_on_failure,
   output_dir: "test/e2e/test-results"
+
+# All browsers in one run: test_helper.exs runs half the schedulers' modules at once, as Playwright
+# Test's workers, and each browser keeps that many workers warm, so a module never restarts another
+# browser's.
+if !System.get_env("PW_BROWSER") do
+  config :playwright_ex, :test, workers: 3 * max(div(System.schedulers_online(), 2), 1)
+end
