@@ -64,4 +64,3 @@ On Chromium, each test dumps its JS and CSS coverage to `test-results/coverage-d
 - No retries: rerun the failures with `mix test --failed` (CI does, twice).
 - Nested `describe` blocks are flattened: the outer one is the module, and a `describe` repeated
   in a loop is one `describe` with the loop inside.
-- playwright_ex comes from git until a Hex release has the test runner; `mix.exs` pins the commit.
