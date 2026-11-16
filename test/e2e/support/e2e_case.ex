@@ -19,8 +19,8 @@ defmodule Phoenix.LiveViewTest.E2E.Case do
   `test/e2e/coverage-report.js` turns the dumps into the report monocart-reporter wrote.
   """
 
-  alias PlaywrightEx.{APIRequest, Browser, BrowserContext, Coverage, Expect, Page, Playwright}
-  alias PlaywrightEx.Test.BrowserPool
+  alias Playwright.{APIRequest, Browser, BrowserContext, Coverage, Expect, Page}
+  alias Playwright.Test.BrowserPool
 
   @devices %{chromium: "Desktop Chrome", firefox: "Desktop Firefox", webkit: "Desktop Safari"}
 
@@ -40,11 +40,11 @@ defmodule Phoenix.LiveViewTest.E2E.Case do
             unquote(opts)
           )
 
-      use PlaywrightEx.Test
+      use Playwright.Test
 
       import Phoenix.LiveViewTest.E2E.Utils
 
-      alias PlaywrightEx.{
+      alias Playwright.{
         APIRequestContext,
         APIResponse,
         Browser,
@@ -63,7 +63,7 @@ defmodule Phoenix.LiveViewTest.E2E.Case do
         WebSocketRoute
       }
 
-      alias PlaywrightEx.Test.BrowserPool
+      alias Playwright.Test.BrowserPool
 
       setup_all ctx do
         Phoenix.LiveViewTest.E2E.Case.browser_fixture(ctx)

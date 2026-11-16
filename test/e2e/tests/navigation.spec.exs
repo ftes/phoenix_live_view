@@ -1,7 +1,7 @@
 defmodule Phoenix.LiveViewTest.E2E.NavigationTest do
   use Phoenix.LiveViewTest.E2E.Case
 
-  alias PlaywrightEx.WebSocket
+  alias Playwright.WebSocket
 
   # upstream's module-level `webSocketEvents` and `networkEvents`, reset in beforeEach,
   # are an `array/0` per test here (the listeners run in processes of their own).

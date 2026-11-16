@@ -178,7 +178,7 @@ $ mix deps.get
 $ npm ci
 $ mix assets.build
 $ MIX_ENV=e2e mix deps.get
-$ MIX_ENV=e2e mix playwright_ex.install
+$ MIX_ENV=e2e mix playwright.install
 $ MIX_ENV=e2e mix test
 # other browsers
 $ PW_BROWSER=firefox MIX_ENV=e2e mix test

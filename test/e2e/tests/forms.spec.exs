@@ -1,7 +1,7 @@
 defmodule Phoenix.LiveViewTest.E2E.FormsTest do
   use Phoenix.LiveViewTest.E2E.Case
 
-  alias PlaywrightEx.WebSocket
+  alias Playwright.WebSocket
 
   # Upstream opens `test.describe("restores disabled and readonly states")` once per path inside
   # the `for (const path ...)` loop; ExUnit forbids two describes with the same name, so the loop
@@ -367,7 +367,7 @@ defmodule Phoenix.LiveViewTest.E2E.FormsTest do
 
               Page.evaluate!(page, "() => window.liveSocket.connect()")
               # `\p` is a plain `p` in a JS regex but an error in PCRE: pass the JS source
-              Expect.to_have_url!(page, PlaywrightEx.RegExp.new("\\patched=true"))
+              Expect.to_have_url!(page, Playwright.RegExp.new("\\patched=true"))
             end
           end
         end

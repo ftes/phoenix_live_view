@@ -55,7 +55,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "e2e:test": "mix assets.build && MIX_ENV=e2e mix playwright_ex.install && MIX_ENV=e2e mix test",
+    "e2e:test": "mix assets.build && MIX_ENV=e2e mix playwright.install && MIX_ENV=e2e mix test",
     "e2e:coverage": "node test/e2e/coverage-report.js",
     "js:test": "npm run build && jest",
     "js:test.coverage": "npm run build && jest --coverage",

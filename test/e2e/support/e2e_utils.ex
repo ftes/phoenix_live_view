@@ -6,7 +6,7 @@ defmodule Phoenix.LiveViewTest.E2E.Utils do
 
   import ExUnit.Assertions
 
-  alias PlaywrightEx.{APIRequestContext, APIResponse, Expect, Locator, Page, Promise}
+  alias Playwright.{APIRequestContext, APIResponse, Expect, Locator, Page, Promise}
 
   def random_string(size \\ 21) do
     size |> :crypto.strong_rand_bytes() |> Base.encode64() |> binary_part(0, size)
@@ -116,7 +116,7 @@ defmodule Phoenix.LiveViewTest.E2E.Utils do
   A JS array that listeners fill (`const logs = []; page.on("console", (e) => logs.push(...))`).
 
   An unlinked process: listeners still run in `on_exit` callbacks, after the test process has
-  exited (see "Route handlers and listeners" in PlaywrightEx's ExUnit guide).
+  exited (see "Route handlers and listeners" in playwright_ex's ExUnit guide).
   """
   def array do
     {:ok, array} = Agent.start(fn -> [] end)

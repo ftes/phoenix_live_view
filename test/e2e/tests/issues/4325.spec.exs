@@ -2,7 +2,7 @@ defmodule Phoenix.LiveViewTest.E2E.Issue4325Test do
   use Phoenix.LiveViewTest.E2E.Case
 
   # elementHandle.evaluate is inherited from JSHandle
-  alias PlaywrightEx.JSHandle
+  alias Playwright.JSHandle
 
   # https://github.com/phoenixframework/phoenix_live_view/issues/4325
   test "setting an id to its current value preserves the element across patches", %{page: page} do

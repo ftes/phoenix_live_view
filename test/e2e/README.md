@@ -1,7 +1,7 @@
 # End-to-end tests
 
 This directory contains end-to-end tests that drive real browsers (Chromium, Firefox, WebKit)
-against a LiveView server, with [PlaywrightEx](https://github.com/ftes/playwright_ex), an Elixir
+against a LiveView server, with [playwright_ex](https://github.com/ftes/playwright_ex), an Elixir
 port of the Playwright client, on ExUnit. They were ported one to one from the Playwright Test
 (JS) suite they replace: `tests/forms.spec.exs` was `tests/forms.spec.js`.
 
@@ -14,7 +14,7 @@ port of the Playwright client, on ExUnit. They were ported one to one from the P
 
 ```bash
 $ MIX_ENV=e2e mix deps.get
-$ MIX_ENV=e2e mix playwright_ex.install # the driver and the browsers
+$ MIX_ENV=e2e mix playwright.install # the driver and the browsers
 $ npm ci && mix assets.build            # the JS under test
 $ MIX_ENV=e2e mix test                  # Chromium, Firefox and WebKit
 $ PW_BROWSER=firefox MIX_ENV=e2e mix test
@@ -25,7 +25,7 @@ A run uses all three browsers, as Playwright's `projects`: each module runs once
 (`parameterize:`), with `browser_name` in the context. `PW_BROWSER` runs one, as `--project`; CI
 runs a job per browser. With all three, half the schedulers' modules run at once, as Playwright's
 workers, and each browser keeps that many warm (`config/e2e.exs`, `test_helper.exs`).
-On Linux, `MIX_ENV=e2e mix playwright_ex.install -- webkit --with-deps` also installs the
+On Linux, `MIX_ENV=e2e mix playwright.install -- webkit --with-deps` also installs the
 browser's system dependencies.
 
 ## Debugging
@@ -34,7 +34,7 @@ Failed tests keep a trace and a screenshot in `test-results/`. The failure print
 trace:
 
 ```bash
-$ MIX_ENV=e2e mix playwright_ex.cli show-trace test/e2e/test-results/<test>/trace.zip
+$ MIX_ENV=e2e mix playwright.cli show-trace test/e2e/test-results/<test>/trace.zip
 ```
 
 To watch a test run, give the run headed, slowed-down browsers (`launch_options` merge over
@@ -42,7 +42,7 @@ To watch a test run, give the run headed, slowed-down browsers (`launch_options`
 
 ```elixir
 # config/e2e.exs
-config :playwright_ex, :test, launch_options: [headless: false, slow_mo: 500]
+config :playwright, :test, launch_options: [headless: false, slow_mo: 500]
 ```
 
 ```bash
@@ -64,4 +64,4 @@ On Chromium, each test dumps its JS and CSS coverage to `test-results/coverage-d
 - No retries: rerun the failures with `mix test --failed` (CI does, twice).
 - Nested `describe` blocks are flattened: the outer one is the module, and a `describe` repeated
   in a loop is one `describe` with the loop inside.
-- PlaywrightEx comes from git until a Hex release has the test runner; `mix.exs` pins the commit.
+- playwright_ex comes from git until a Hex release has the test runner; `mix.exs` pins the commit.

@@ -5,7 +5,7 @@ config :logger, :level, :error
 config :phoenix_live_view, :root_tag_attribute, "phx-r"
 
 # playwright.config.js's `use` and `outputDir` (its `projects`: `E2E.Case.projects/0`)
-config :playwright_ex, :test,
+config :playwright, :test,
   context_options: [base_url: "http://localhost:4004/", ignore_https_errors: true],
   trace: :retain_on_failure,
   screenshot: :only_on_failure,
@@ -15,5 +15,5 @@ config :playwright_ex, :test,
 # Test's workers, and each browser keeps that many workers warm, so a module never restarts another
 # browser's.
 if !System.get_env("PW_BROWSER") do
-  config :playwright_ex, :test, workers: 3 * max(div(System.schedulers_online(), 2), 1)
+  config :playwright, :test, workers: 3 * max(div(System.schedulers_online(), 2), 1)
 end

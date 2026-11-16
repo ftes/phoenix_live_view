@@ -18,7 +18,7 @@ defmodule Phoenix.LiveViewTest.E2E.Issue3368Test do
       )
 
     Page.dispatch_event!(page, "#dropzone", "drop", %{dataTransfer: data_transfer})
-    PlaywrightEx.JSHandle.dispose!(data_transfer)
+    Playwright.JSHandle.dispose!(data_transfer)
     sync_lv(page)
   end
 

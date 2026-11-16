@@ -1,7 +1,7 @@
 defmodule Phoenix.LiveViewTest.E2E.Issue3931Test do
   use Phoenix.LiveViewTest.E2E.Case
 
-  alias PlaywrightEx.WebSocket
+  alias Playwright.WebSocket
 
   # https://github.com/phoenixframework/phoenix_live_view/issues/3931
   test "dynamic attributes reset __changed__ and properly re-render", %{page: page} do

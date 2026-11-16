@@ -4,7 +4,7 @@ defmodule Phoenix.LiveViewTest.E2E.ErrorsTest do
   """
   use Phoenix.LiveViewTest.E2E.Case
 
-  alias PlaywrightEx.{Response, WebSocket}
+  alias Playwright.{Response, WebSocket}
 
   # test.describe("exception handling"): ExUnit's describe blocks don't nest, so the outer
   # describe is the module (its beforeEach a module-level setup) and the inner describes are
