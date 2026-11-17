@@ -178,7 +178,7 @@ jobs:
     runs-on: ubuntu-24.04
     # the browsers of playwright_ex's driver version
     container:
-      image: mcr.microsoft.com/playwright:v1.65.0-noble
+      image: mcr.microsoft.com/playwright:v1.65.1-noble
     env:
       ImageOS: ubuntu22
       HOME: /root
