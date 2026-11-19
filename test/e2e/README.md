@@ -6,8 +6,9 @@ port of the Playwright client, on ExUnit. They were ported one to one from the P
 (JS) suite they replace: `tests/forms.spec.exs` was `tests/forms.spec.js`.
 
 - `test_helper.exs` defines and starts the server on port 4004 (`Phoenix.LiveViewTest.E2E.Endpoint`).
-- `support/` holds the LiveViews under test, `Phoenix.LiveViewTest.E2E.Case` (the fixtures:
-  `page`, `request`, `browser_name`) and `Phoenix.LiveViewTest.E2E.Utils` (`utils.js`).
+- `support/` holds the LiveViews under test, `Phoenix.LiveViewTest.E2E.Case` (`Playwright.Case`
+  with the projects and `test-fixtures.js`: `request`, the `page` checks, coverage) and
+  `Phoenix.LiveViewTest.E2E.Utils` (`utils.js`).
 - `tests/` holds the tests, one module per former spec file.
 
 ## Running the tests

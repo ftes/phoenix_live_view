@@ -1,13 +1,11 @@
 defmodule Phoenix.LiveViewTest.E2E.Case do
   @moduledoc """
-  The fixtures of the e2e tests (`page`, `request`, `browser_name`) and the projects' devices.
+  The fixtures of the e2e tests (`test-fixtures.js`: `page`'s checks, `request`, coverage) and
+  the config's `projects`.
 
-  Each module runs once per project (`parameterize: projects()`), with `browser_name` in the
-  context as Playwright Test's `browserName` fixture; `PW_BROWSER=firefox` runs one project, as
-  `--project`. Each module holds a pooled driver and browser of its project
-  (`BrowserPool.browser/1` in `setup_all`), as Playwright Test's workers.
-  Tests get a fresh context with the browser's desktop device, as the `projects` of a
-  Playwright config with `devices["Desktop Chrome"]` and so on.
+  Each module runs once per project (`parameterize: projects()`), each a desktop device, and
+  gets Playwright Test's `browser`, `browserName` (`browser_name`), `context` and `page` from
+  `Playwright.Case`; `PW_BROWSER=firefox` runs one project, as `--project`.
 
   The `page` fixture's checks (no unhandled page errors unless `ignore_js_errors`, no
   `[data-phx-skip]` left) run after the test, in an `on_exit`, as the fixture's teardown.
@@ -19,55 +17,45 @@ defmodule Phoenix.LiveViewTest.E2E.Case do
   `test/e2e/coverage-report.js` turns the dumps into the report monocart-reporter wrote.
   """
 
-  alias Playwright.{APIRequest, Browser, BrowserContext, Coverage, Expect, Page}
+  alias Playwright.{APIRequest, Coverage, Expect, Page}
   alias Playwright.Test.BrowserPool
 
-  @devices %{chromium: "Desktop Chrome", firefox: "Desktop Firefox", webkit: "Desktop Safari"}
+  @devices %{
+    "chromium" => "Desktop Chrome",
+    "firefox" => "Desktop Firefox",
+    "webkit" => "Desktop Safari"
+  }
 
   @doc "The config's `projects`: all browsers, or `PW_BROWSER`'s."
   def projects do
-    case System.get_env("PW_BROWSER") do
-      nil -> for name <- [:chromium, :firefox, :webkit], do: %{browser_name: name}
-      name -> [%{browser_name: String.to_atom(name)}]
-    end
+    names =
+      if name = System.get_env("PW_BROWSER"), do: [name], else: ["chromium", "firefox", "webkit"]
+
+    for name <- names,
+        do: Playwright.Test.parameters(Playwright.device(Map.fetch!(@devices, name)))
   end
 
   defmacro __using__(opts) do
     quote do
-      use ExUnit.Case,
+      use Playwright.Case,
           Keyword.merge(
             [async: true, parameterize: Phoenix.LiveViewTest.E2E.Case.projects()],
             unquote(opts)
           )
-
-      use Playwright.Test
 
       import Phoenix.LiveViewTest.E2E.Utils
 
       alias Playwright.{
         APIRequestContext,
         APIResponse,
-        Browser,
-        BrowserContext,
         ConsoleMessage,
         Dialog,
         Download,
-        Expect,
-        Keyboard,
-        Locator,
-        Mouse,
-        Page,
         Promise,
         Request,
         Route,
         WebSocketRoute
       }
-
-      alias Playwright.Test.BrowserPool
-
-      setup_all ctx do
-        Phoenix.LiveViewTest.E2E.Case.browser_fixture(ctx)
-      end
 
       setup ctx do
         Phoenix.LiveViewTest.E2E.Case.page_fixture(ctx)
@@ -76,25 +64,7 @@ defmodule Phoenix.LiveViewTest.E2E.Case do
   end
 
   @doc false
-  def browser_fixture(%{browser_name: name}) do
-    browser = BrowserPool.browser(browser_name: name)
-    playwright = BrowserPool.playwright(browser)
-
-    # `devices["Desktop Chrome"]` and so on, of the project's browser
-    device =
-      playwright
-      |> Playwright.devices()
-      |> Map.fetch!(@devices[name])
-      |> Map.delete(:default_browser_type)
-
-    %{browser: browser, device: device, playwright: playwright}
-  end
-
-  @doc false
-  def page_fixture(%{browser: browser, device: device, playwright: playwright} = ctx) do
-    context = Browser.new_context!(browser, device)
-    page = BrowserContext.new_page!(context)
-
+  def page_fixture(%{browser: browser, page: page} = ctx) do
     # pageChecks: the errors outlive the test process, for the teardown in on_exit
     {:ok, errors} = Agent.start(fn -> [] end)
     Page.on(page, :page_error, fn error -> Agent.update(errors, &(&1 ++ [error])) end)
@@ -120,9 +90,10 @@ defmodule Phoenix.LiveViewTest.E2E.Case do
 
     # Playwright Test's `request` fixture: a request context with the config's `use`,
     # disposed at the end of the test.
-    request = playwright |> Playwright.request() |> APIRequest.new_context!()
+    request =
+      browser |> BrowserPool.playwright() |> Playwright.request() |> APIRequest.new_context!()
 
-    %{context: context, page: page, request: request}
+    %{request: request}
   end
 
   @coverage_dir "test/e2e/test-results/coverage-dumps"

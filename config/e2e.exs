@@ -6,7 +6,8 @@ config :phoenix_live_view, :root_tag_attribute, "phx-r"
 
 # playwright.config.js's `use` and `outputDir` (its `projects`: `E2E.Case.projects/0`)
 config :playwright, :test,
-  context_options: [base_url: "http://localhost:4004/", ignore_https_errors: true],
+  base_url: "http://localhost:4004/",
+  ignore_https_errors: true,
   trace: :retain_on_failure,
   screenshot: :only_on_failure,
   output_dir: "test/e2e/test-results"
