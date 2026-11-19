@@ -354,7 +354,7 @@ Phoenix.LiveView.ColocatedAssets.compile()
 # Playwright Test's default test timeout. All browsers in one run (no PW_BROWSER): half the
 # schedulers' modules at once, as Playwright Test's workers (`--max-cases` overrides it).
 max_cases =
-  if System.get_env("PW_BROWSER"),
+  if System.get_env("PW_BROWSER", "") != "",
     do: [],
     else: [max_cases: max(div(System.schedulers_online(), 2), 1)]
 

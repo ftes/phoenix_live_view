@@ -436,6 +436,7 @@ defmodule Phoenix.LiveViewTest.E2E.StreamsTest do
   end
 
   describe "stream limit - issue #2686" do
+    @tag :request
     test "limit is enforced on mount, but not dead render", %{page: page, request: request} do
       html = request |> APIRequestContext.get!("/stream/limit") |> APIResponse.text!()
 

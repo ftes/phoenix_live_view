@@ -2,6 +2,7 @@ defmodule Phoenix.LiveViewTest.E2E.Issue3681Test do
   use Phoenix.LiveViewTest.E2E.Case
 
   # https://github.com/phoenixframework/phoenix_live_view/issues/3681
+  @tag :request
   test "streams in nested LiveViews are not reset when they share the same stream ref",
        %{page: page, request: request} do
     # this was a separate bug where child LiveViews accidentally shared the parent streams

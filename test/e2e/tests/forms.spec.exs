@@ -386,6 +386,7 @@ defmodule Phoenix.LiveViewTest.E2E.FormsTest do
       page |> Page.get_by_text("Form was submitted!") |> Expect.to_be_visible!()
     end
 
+    @tag :request
     test "#{path} - loading and locked states with latency", %{page: page, request: request} do
       nested = String.match?(unquote(path), ~r/nested/)
       Page.goto!(page, "#{unquote(path)}?phx-change=validate")
@@ -473,6 +474,7 @@ defmodule Phoenix.LiveViewTest.E2E.FormsTest do
     end
   end
 
+  @tag :request
   test "loading and locked states with latent clone", %{page: page, request: request} do
     Page.goto!(page, "/form/stream")
     form_hook = Page.locator(page, "#form-stream-hook")

@@ -10,7 +10,8 @@ defmodule Phoenix.LiveViewTest.E2E.Case do
   The `page` fixture's checks (no unhandled page errors unless `ignore_js_errors`, no
   `[data-phx-skip]` left) run after the test, in an `on_exit`, as the fixture's teardown.
   `@tag ignore_js_errors: true` (or `@describetag`, `@moduletag`) is
-  `test.use({ ignoreJSErrors: true })`.
+  `test.use({ ignoreJSErrors: true })`. A test that takes `request` tags itself `@tag :request`,
+  as the fixture is created only for the tests that destructure it.
 
   On Chromium, each test records the page's JS and CSS coverage (`autoTestFixture`) and dumps it
   to `test/e2e/test-results/coverage-dumps`, unless `PW_NO_COVERAGE` is set;
@@ -20,19 +21,19 @@ defmodule Phoenix.LiveViewTest.E2E.Case do
   alias Playwright.{APIRequest, Coverage, Expect, Page}
   alias Playwright.Test.BrowserPool
 
-  @devices %{
-    "chromium" => "Desktop Chrome",
-    "firefox" => "Desktop Firefox",
-    "webkit" => "Desktop Safari"
-  }
+  @projects [chromium: "Desktop Chrome", firefox: "Desktop Firefox", webkit: "Desktop Safari"]
 
   @doc "The config's `projects`: all browsers, or `PW_BROWSER`'s."
   def projects do
-    names =
-      if name = System.get_env("PW_BROWSER"), do: [name], else: ["chromium", "firefox", "webkit"]
+    name = System.get_env("PW_BROWSER", "")
+    devices = for {project, device} <- @projects, name in ["", "#{project}"], do: device
 
-    for name <- names,
-        do: Playwright.Test.parameters(Playwright.device(Map.fetch!(@devices, name)))
+    if devices == [] do
+      available = Enum.map_join(@projects, ", ", fn {project, _} -> ~s("#{project}") end)
+      raise ArgumentError, ~s[Project(s) "#{name}" not found. Available projects: #{available}]
+    end
+
+    for device <- devices, do: Playwright.Test.parameters(Playwright.device(device))
   end
 
   defmacro __using__(opts) do
@@ -88,12 +89,16 @@ defmodule Phoenix.LiveViewTest.E2E.Case do
       coverage_fixture(page)
     end
 
-    # Playwright Test's `request` fixture: a request context with the config's `use`,
-    # disposed at the end of the test.
-    request =
-      browser |> BrowserPool.playwright() |> Playwright.request() |> APIRequest.new_context!()
+    # Playwright Test's `request` fixture, for the tests that take it (`@tag :request`): a
+    # request context with the config's `use`, disposed at the end of the test.
+    if ctx[:request] == true do
+      request =
+        browser |> BrowserPool.playwright() |> Playwright.request() |> APIRequest.new_context!()
 
-    %{request: request}
+      %{request: request}
+    else
+      %{}
+    end
   end
 
   @coverage_dir "test/e2e/test-results/coverage-dumps"

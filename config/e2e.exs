@@ -15,6 +15,6 @@ config :playwright, :test,
 # All browsers in one run: test_helper.exs runs half the schedulers' modules at once, as Playwright
 # Test's workers, and each browser keeps that many workers warm, so a module never restarts another
 # browser's.
-if !System.get_env("PW_BROWSER") do
+if System.get_env("PW_BROWSER", "") == "" do
   config :playwright, :test, workers: 3 * max(div(System.schedulers_online(), 2), 1)
 end
